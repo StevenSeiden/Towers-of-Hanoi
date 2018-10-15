@@ -35,30 +35,80 @@ solvePuzzle(numPieces, start, final, [others1, others2]) =
   ++solvePuzzle(partialPieces, others1, final, [start, others2])
     where
       partialPieces = optimal --truncation(numPieces - 3/4)
-      optimal = 1+ numPieces-rounded(sqrt(2*numPieces+1))
+      optimal = numPieces-rounded(sqrt(2*numPieces+1)-1)
       
       
-solvePuzzle(numPieces, start, final, [others1, others2,other3]) = 
-    solvePuzzle(partialPieces, start, others1, [final, others2, other3])
-  ++solvePuzzle(numPieces - partialPieces, start, final, [others2,other3])
-  ++solvePuzzle(partialPieces, others1, final, [start, others2, other3])
+solvePuzzle(numPieces, start, final, [others1, others2,others3]) = 
+    solvePuzzle(partialPieces, start, others1, [final, others2, others3])
+  ++solvePuzzle(numPieces - partialPieces, start, final, [others2,others3])
+  ++solvePuzzle(partialPieces, others1, final, [start, others2, others3])
     where
-      partialPieces = optimal --truncation(numPieces - 3/4)
-      optimal = 1+ numPieces-rounded(sqrt(2*numPieces+1))
+      partialPieces = truncation(numPieces*numPieces/100) --truncation(numPieces - 3/4)
+      optimal = numPieces-(rounded(sqrt(2*numPieces+1)+1))
+        
+solvePuzzle(numPieces,start,final,[others1,others2,others3,others4]) =
+    solvePuzzle(partialPieces,start,others1,[final,others1,others3,others4])
+  ++solvePuzzle(numPieces-partialPieces,start,others1,[final,others2,others3,others4])
+  ++solvePuzzle(partialPieces,others1,final,[start,others2,others3,others4])
+     where
+      partialPieces = traced(optimal,printed(optimal))
+      optimal = numPieces-(rounded(sqrt(2*numPieces*1)) + 1)
       
-solvePuzzle(numPieces, start, final, others) = error message
+--solvePuzzle(numPieces, start, final, others) = error message
+main = drawingOf(table)
   where
-    message = joined([printed(numPieces), " ", 
-      printed(start), " ", 
-      printed(final), " ", 
-      printedNumbers(others)])
- 
+    table =  scaled(translated(text("Steven Seiden"),-13.5,12.5),0.5,0.5)
+      & translated(text("4 stacks"),-2,6.5)
+      & translated(text("5 stacks"),2,6.5)
+      & translated(text("6 stacks"),6.5,6.5)
+      
+      & translated(text("15"),-7,3.5)
+      & translated(text("20"),-7,0)
+      & translated(text("40"),-7,-3.5)
+      & translated(text("50"),-7,-6.5)
+      
+      & translated(text(printed(length(solvePuzzle(15,1,4,[2,3])))),-2,3.5)
+      & translated(text(printed(length(solvePuzzle(20,1,4,[2,3])))),-2,0)
+      & translated(text(printed(length(solvePuzzle(40,1,4,[2,3])))),-2,-3.5)
+      & translated(text(printed(length(solvePuzzle(50,1,4,[2,3])))),-2,-6.5)
+      
+      & translated(text(printed(length(solvePuzzle(15,1,5,[2,3,4])))),2,3.5)
+      & translated(text(printed(length(solvePuzzle(20,1,5,[2,3,4])))),2,0)
+      & translated(text(printed(length(solvePuzzle(40,1,5,[2,3,4])))),2,-3.5)
+      & translated(text(printed(length(solvePuzzle(50,1,5,[2,3,4])))),2,-6.5)
+      
+      & translated(text(printed(length(solvePuzzle(15,1,6,[2,3,4,5])))),6,3.5)
+      & translated(text(printed(length(solvePuzzle(20,1,6,[2,3,4,5])))),6,0)
+      & translated(text(printed(length(solvePuzzle(40,1,6,[2,3,4,5])))),6,-3.5)
+      & translated(text(printed(length(solvePuzzle(50,1,6,[2,3,4,5])))),6,-6.5)
+      
+      
+      
+      & rectangle(18,15)
+      & rectangle(18,3.5)
+      & rectangle(18,10)
+      & rectangle(9,15)
+      & rectangle(0,15)
+      where
+        message = joined([printed(numPieces), "      ",
+          printed(start), "      ",
+          printed(final), "      ",
+          printedNumbers(others),"      ",
+          printed(length(moveSequence)),"      "])
+              
+          
+    moveSequence = solvePuzzle(numPieces,start,final,others)
+    numPieces = 70
+    start = 1
+    final = 6
+    others = [2,3]
 ---------------------------------------------------
 
 moveSequence = solvePuzzle(numPieces,1,3,[2,4])
+    where
+      solvedPuzzle = solvePuzzle(numPieces,1,6,[2,3,4])
 
-
-numPieces = 70 -- try these afterwards: 35, 70, 126
+numPieces = 35 -- try these afterwards: 35, 70, 126
 
 frameDelay = 0 -- seconds
 
@@ -70,7 +120,7 @@ frameDelay = 0 -- seconds
 -- Game logic
 -------------------------------------------------------------------------------
 
-main = interactionOf(start,step,input,draw)
+--main = interactionOf(start,step,input,draw)
 
 type Move = [Stack] -> [Stack]
 type Stack = [Number]
